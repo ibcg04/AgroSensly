@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/types.ts","./src/vite-env.d.ts","./src/components/AIAssistant.tsx","./src/components/CropSelector.tsx","./src/components/DashboardCard.tsx","./src/components/SensorCard.tsx","./src/components/WeatherCard.tsx","./src/lib/api.ts"],"version":"5.9.3"}
