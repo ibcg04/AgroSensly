@@ -11,3 +11,6 @@ frontend/.vite/
 
 .env
 .env.*
+
+.vercel/
+.vercel
