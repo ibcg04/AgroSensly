@@ -39,6 +39,7 @@ export function CropsView({ activeCrop, onSelectCrop, onOpenAssistant }: CropsVi
                 key={crop.id}
                 className={selected ? 'is-active' : ''}
                 aria-current={selected ? 'true' : undefined}
+                style={{ '--crop-accent': crop.accent } as CSSProperties}
                 onClick={() => onSelectCrop(crop.id)}
               >
                 <span className="crop-index__number">{String(index + 1).padStart(2, '0')}</span>
