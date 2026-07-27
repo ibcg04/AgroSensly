@@ -1,5 +1,5 @@
-import type { AIRecommendation, CropId, SensorReading, WeatherForecast } from '../types';
-import { buildCropAnswer, getCropProfile } from '../data/crops';
+import type { AIRecommendation, CropProfile, SensorReading, WeatherForecast } from '../types';
+import { buildCropAnswer } from '../data/crops';
 
 const API_URL = import.meta.env.VITE_API_URL as string | undefined;
 
@@ -70,26 +70,31 @@ export async function getWeatherForecast(city: string): Promise<WeatherForecast>
 }
 
 export async function getAIRecommendation(payload: {
-  crop_id: CropId;
+  crop: CropProfile;
   current_moisture: number;
   weather: WeatherForecast;
 }): Promise<AIRecommendation> {
   try {
     const response = await fetchJson<{ status: string; data: AIRecommendation }>('/ai/recommendation', {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        crop_id: payload.crop.id,
+        crop_profile: payload.crop,
+        current_moisture: payload.current_moisture,
+        weather: payload.weather,
+      }),
     });
 
     return response.data;
   } catch {
-    const crop = getCropProfile(payload.crop_id);
+    const crop = payload.crop;
     const isDry = payload.current_moisture < crop.moistureMin;
     const isWet = payload.current_moisture > crop.moistureMax;
     const likelyRain = payload.weather.rainfall_probability >= 70;
 
     if (isDry && !likelyRain) {
       return {
-        crop_id: payload.crop_id,
+        crop_id: crop.id,
         recommendation: 'Riego recomendado',
         priority: 'alta',
         reasoning: `La humedad está por debajo del ${crop.moistureMin}% recomendado y no se espera lluvia suficiente.`,
@@ -100,7 +105,7 @@ export async function getAIRecommendation(payload: {
 
     if (isWet || likelyRain) {
       return {
-        crop_id: payload.crop_id,
+        crop_id: crop.id,
         recommendation: 'No riegues todavía',
         priority: isWet ? 'media' : 'baja',
         reasoning: isWet
@@ -112,7 +117,7 @@ export async function getAIRecommendation(payload: {
     }
 
     return {
-      crop_id: payload.crop_id,
+      crop_id: crop.id,
       recommendation: 'Tu cultivo está estable',
       priority: 'baja',
       reasoning: `La humedad está dentro del rango ideal de ${crop.moistureMin}%–${crop.moistureMax}% para ${crop.name.toLowerCase()}.`,
@@ -123,7 +128,7 @@ export async function getAIRecommendation(payload: {
 }
 
 export async function getCropAdvice(payload: {
-  crop_id: CropId;
+  crop: CropProfile;
   question: string;
   sensor: SensorReading | null;
   weather: WeatherForecast | null;
@@ -135,7 +140,8 @@ export async function getCropAdvice(payload: {
     }>('/ai/crop-advice', {
       method: 'POST',
       body: JSON.stringify({
-        crop_id: payload.crop_id,
+        crop_id: payload.crop.id,
+        crop_profile: payload.crop,
         question: payload.question,
         current_moisture: payload.sensor?.soil_moisture,
         ambient_temperature: payload.weather?.ambient_temperature,
@@ -145,11 +151,6 @@ export async function getCropAdvice(payload: {
 
     return response.data.answer;
   } catch {
-    return buildCropAnswer(
-      getCropProfile(payload.crop_id),
-      payload.question,
-      payload.sensor,
-      payload.weather,
-    );
+    return buildCropAnswer(payload.crop, payload.question, payload.sensor, payload.weather);
   }
 }

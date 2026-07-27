@@ -1,10 +1,10 @@
 import type { CSSProperties } from 'react';
 
-import { getCropProfile } from '../data/crops';
 import type { CropId } from '../types';
 
 type CropGlyphProps = {
   cropId: CropId;
+  accent?: string;
   size?: number;
   className?: string;
 };
@@ -51,12 +51,23 @@ function CropShape({ cropId }: { cropId: CropId }) {
           <path d="M8.3 6.6C4 6.6 1.8 10 3 14.7 4 18.5 7.2 21 12 21s8-2.5 9-6.3c1.2-4.7-1-8.1-5.3-8.1-1.5 0-2.7.5-3.7 1.4-1-.9-2.2-1.4-3.7-1.4ZM12 8v13M12 8c0-3 1.4-4.7 4.2-5" />
         </>
       );
+    default:
+      return (
+        <>
+          <path
+            fill="currentColor"
+            stroke="none"
+            opacity=".24"
+            d="M11.8 15.2C6.7 15.2 4 12.5 4 7.4c5.1 0 7.8 2.7 7.8 7.8Zm.4-3.8c0-5.2 2.6-7.9 7.8-7.9 0 5.2-2.7 7.9-7.8 7.9Z"
+          />
+          <path d="M12 21V10.7M11.8 15.2C6.7 15.2 4 12.5 4 7.4c5.1 0 7.8 2.7 7.8 7.8Zm.4-3.8c0-5.2 2.6-7.9 7.8-7.9 0 5.2-2.7 7.9-7.8 7.9ZM7 21h10" />
+        </>
+      );
   }
 }
 
-export function CropGlyph({ cropId, size = 24, className }: CropGlyphProps) {
-  const crop = getCropProfile(cropId);
-  const style: CSSProperties = { color: crop.accent };
+export function CropGlyph({ cropId, accent = '#b7e84b', size = 24, className }: CropGlyphProps) {
+  const style: CSSProperties = { color: accent };
 
   return (
     <svg

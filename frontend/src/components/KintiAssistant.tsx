@@ -2,11 +2,11 @@ import { FormEvent, useEffect, useRef, useState } from 'react';
 
 import { AgroIcon } from './AgroIcon';
 import { CropGlyph } from './CropGlyph';
-import { CROPS } from '../data/crops';
 import { getCropAdvice } from '../lib/api';
 import type { CropId, CropProfile, SensorReading, WeatherForecast } from '../types';
 
 type KintiAssistantProps = {
+  crops: CropProfile[];
   crop: CropProfile;
   sensor: SensorReading | null;
   weather: WeatherForecast | null;
@@ -31,7 +31,7 @@ function welcomeMessage(crop: CropProfile, sensor: SensorReading | null) {
   return `Analicemos tu ${crop.name.toLowerCase()}.${sensorCopy} Pregúntame por riego, suelo, luz, ciclo o señales de estrés.`;
 }
 
-export function KintiAssistant({ crop, sensor, weather, onSelectCrop }: KintiAssistantProps) {
+export function KintiAssistant({ crops, crop, sensor, weather, onSelectCrop }: KintiAssistantProps) {
   const [question, setQuestion] = useState('');
   const [thinking, setThinking] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -62,7 +62,7 @@ export function KintiAssistant({ crop, sensor, weather, onSelectCrop }: KintiAss
 
     responseTimer.current = window.setTimeout(() => {
       void getCropAdvice({
-        crop_id: crop.id,
+        crop,
         question: cleanQuestion,
         sensor,
         weather,
@@ -114,9 +114,9 @@ export function KintiAssistant({ crop, sensor, weather, onSelectCrop }: KintiAss
             <div>
               <span>Conversación sobre</span>
               <label>
-                <CropGlyph cropId={crop.id} size={22} />
+                <CropGlyph cropId={crop.id} accent={crop.accent} size={22} />
                 <select value={crop.id} onChange={(event) => onSelectCrop(event.target.value as CropId)}>
-                  {CROPS.map((item) => (
+                  {crops.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.name}
                     </option>

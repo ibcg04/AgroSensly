@@ -1,18 +1,37 @@
-import type { CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
 
 import { AgroIcon } from './AgroIcon';
+import { CropCreator } from './CropCreator';
 import { CropGlyph } from './CropGlyph';
-import { CROPS } from '../data/crops';
-import type { CropId, CropProfile } from '../types';
+import type { CropId, CropProfile, NewCropProfile } from '../types';
 
 type CropsViewProps = {
+  crops: CropProfile[];
   activeCrop: CropProfile;
   onSelectCrop: (cropId: CropId) => void;
+  onAddCrop: (crop: NewCropProfile) => void;
   onOpenAssistant: () => void;
 };
 
-export function CropsView({ activeCrop, onSelectCrop, onOpenAssistant }: CropsViewProps) {
+export function CropsView({
+  crops,
+  activeCrop,
+  onSelectCrop,
+  onAddCrop,
+  onOpenAssistant,
+}: CropsViewProps) {
+  const [isCreating, setIsCreating] = useState(false);
   const accentStyle = { '--crop-accent': activeCrop.accent } as CSSProperties;
+
+  function selectCrop(cropId: CropId) {
+    setIsCreating(false);
+    onSelectCrop(cropId);
+  }
+
+  function saveCrop(crop: NewCropProfile) {
+    setIsCreating(false);
+    onAddCrop(crop);
+  }
 
   return (
     <section className="view crops-view" aria-labelledby="crops-title">
@@ -23,15 +42,15 @@ export function CropsView({ activeCrop, onSelectCrop, onOpenAssistant }: CropsVi
         </div>
         <div className="sync-meta">
           <span>Perfiles disponibles</span>
-          <strong>{String(CROPS.length).padStart(2, '0')} hortalizas</strong>
+          <strong>{String(crops.length).padStart(2, '0')} hortalizas</strong>
         </div>
       </header>
 
       <div className="crop-workspace">
         <nav className="crop-index" aria-label="Seleccionar cultivo">
           <p>Selecciona una ficha</p>
-          {CROPS.map((crop, index) => {
-            const selected = crop.id === activeCrop.id;
+          {crops.map((crop, index) => {
+            const selected = !isCreating && crop.id === activeCrop.id;
 
             return (
               <button
@@ -40,21 +59,39 @@ export function CropsView({ activeCrop, onSelectCrop, onOpenAssistant }: CropsVi
                 className={selected ? 'is-active' : ''}
                 aria-current={selected ? 'true' : undefined}
                 style={{ '--crop-accent': crop.accent } as CSSProperties}
-                onClick={() => onSelectCrop(crop.id)}
+                onClick={() => selectCrop(crop.id)}
               >
                 <span className="crop-index__number">{String(index + 1).padStart(2, '0')}</span>
-                <CropGlyph cropId={crop.id} size={25} />
+                <CropGlyph cropId={crop.id} accent={crop.accent} size={25} />
                 <span>
                   <strong>{crop.name}</strong>
-                  <small>{crop.variety}</small>
+                  <small>{crop.variety}{crop.isCustom ? ' · propia' : ''}</small>
                 </span>
                 <AgroIcon name="arrow" size={16} />
               </button>
             );
           })}
+          <button
+            type="button"
+            className={`crop-add-trigger${isCreating ? ' is-active' : ''}`}
+            aria-expanded={isCreating}
+            onClick={() => setIsCreating(true)}
+          >
+            <span className="crop-add-trigger__icon">
+              <AgroIcon name="add" size={23} />
+            </span>
+            <span>
+              <strong>Nueva hortaliza</strong>
+              <small>Crear ficha propia</small>
+            </span>
+            <AgroIcon name="arrow" size={16} />
+          </button>
         </nav>
 
-        <div className="crop-document" style={accentStyle}>
+        {isCreating ? (
+          <CropCreator onCancel={() => setIsCreating(false)} onSave={saveCrop} />
+        ) : (
+          <div className="crop-document" style={accentStyle}>
           <header className="crop-document__header">
             <div>
               <span className="crop-status">
@@ -65,7 +102,7 @@ export function CropsView({ activeCrop, onSelectCrop, onOpenAssistant }: CropsVi
               <h2>{activeCrop.name}</h2>
             </div>
             <div className="crop-document__symbol">
-              <CropGlyph cropId={activeCrop.id} size={112} />
+              <CropGlyph cropId={activeCrop.id} accent={activeCrop.accent} size={112} />
             </div>
           </header>
 
@@ -141,7 +178,8 @@ export function CropsView({ activeCrop, onSelectCrop, onOpenAssistant }: CropsVi
             </span>
             <AgroIcon name="arrow" size={21} />
           </button>
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );

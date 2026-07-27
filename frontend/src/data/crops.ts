@@ -1,4 +1,12 @@
-import type { CropId, CropProfile, SensorReading, WeatherForecast } from '../types';
+import type {
+  CropId,
+  CropProfile,
+  NewCropProfile,
+  SensorReading,
+  WeatherForecast,
+} from '../types';
+
+const CUSTOM_CROPS_STORAGE_KEY = 'agrosensly.custom-crops.v1';
 
 export const CROPS: CropProfile[] = [
   {
@@ -88,8 +96,77 @@ export const CROPS: CropProfile[] = [
   },
 ];
 
-export function getCropProfile(cropId: CropId): CropProfile {
-  return CROPS.find((crop) => crop.id === cropId) ?? CROPS[0];
+export function getCropProfile(cropId: CropId, crops: CropProfile[] = CROPS): CropProfile {
+  return crops.find((crop) => crop.id === cropId) ?? crops[0] ?? CROPS[0];
+}
+
+function isCropProfile(value: unknown): value is CropProfile {
+  if (!value || typeof value !== 'object') return false;
+
+  const crop = value as Record<string, unknown>;
+  const textFields = [
+    'id',
+    'name',
+    'variety',
+    'accent',
+    'sunlight',
+    'soilPh',
+    'temperature',
+    'cycle',
+    'spacing',
+    'watering',
+    'tip',
+    'risks',
+  ];
+
+  return (
+    crop.isCustom === true &&
+    textFields.every((field) => typeof crop[field] === 'string' && crop[field].length > 0) &&
+    typeof crop.moistureMin === 'number' &&
+    typeof crop.moistureMax === 'number' &&
+    Array.isArray(crop.stages) &&
+    crop.stages.length > 0 &&
+    crop.stages.every((stage) => typeof stage === 'string' && stage.length > 0)
+  );
+}
+
+export function loadCustomCrops(): CropProfile[] {
+  try {
+    const storedCrops = window.localStorage.getItem(CUSTOM_CROPS_STORAGE_KEY);
+    if (!storedCrops) return [];
+
+    const parsedCrops: unknown = JSON.parse(storedCrops);
+    return Array.isArray(parsedCrops) ? parsedCrops.filter(isCropProfile) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCustomCrops(crops: CropProfile[]) {
+  try {
+    window.localStorage.setItem(
+      CUSTOM_CROPS_STORAGE_KEY,
+      JSON.stringify(crops.filter((crop) => crop.isCustom)),
+    );
+  } catch {
+    // The app stays usable when storage is unavailable or full.
+  }
+}
+
+export function createCustomCrop(profile: NewCropProfile): CropProfile {
+  const slug =
+    profile.name
+      .toLocaleLowerCase('es')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') || 'hortaliza';
+
+  return {
+    ...profile,
+    id: `custom-${slug}-${Date.now().toString(36)}`,
+    isCustom: true,
+  };
 }
 
 function normalizedQuestion(question: string) {

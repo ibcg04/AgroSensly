@@ -115,7 +115,7 @@ export function HomeView({
             <div>
               <span>Cultivo activo</span>
               <strong>
-                <CropGlyph cropId={crop.id} size={18} />
+                <CropGlyph cropId={crop.id} accent={crop.accent} size={18} />
                 {crop.name}
               </strong>
             </div>

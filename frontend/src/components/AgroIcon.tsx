@@ -18,6 +18,7 @@ export type AgroIconName =
   | 'scan'
   | 'book'
   | 'lock'
+  | 'add'
   | 'send';
 
 type AgroIconProps = Omit<SVGProps<SVGSVGElement>, 'name'> & {
@@ -169,6 +170,12 @@ const icons: Record<AgroIconName, ReactNode> = {
       <rect x="4.5" y="10" width="15" height="11" rx="2" fill="currentColor" stroke="none" opacity=".28" />
       <rect x="4.5" y="10" width="15" height="11" rx="2" />
       <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" />
+    </>
+  ),
+  add: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="3" fill="currentColor" stroke="none" opacity=".22" />
+      <path d="M12 7v10M7 12h10" />
     </>
   ),
   send: (

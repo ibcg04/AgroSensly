@@ -1,9 +1,10 @@
-export type CropId = 'tomate' | 'lechuga' | 'albahaca' | 'pepino' | 'pimiento';
+export type CropId = string;
 
 export type AppView = 'home' | 'crops' | 'missions' | 'assistant';
 
 export type CropProfile = {
   id: CropId;
+  isCustom?: boolean;
   name: string;
   variety: string;
   accent: string;
@@ -19,6 +20,8 @@ export type CropProfile = {
   risks: string;
   stages: string[];
 };
+
+export type NewCropProfile = Omit<CropProfile, 'id' | 'isCustom'>;
 
 export type SensorReading = {
   soil_moisture: number;
