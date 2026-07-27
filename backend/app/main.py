@@ -8,7 +8,7 @@ from app.routers.weather import router as weather_router
 app = FastAPI(
     title="AgroSensly API",
     version="1.1.0",
-    description="API de prototipo para monitoreo agrícola, clima, recomendaciones de riego y guía hortícola contextual.",
+    description="API para monitoreo agrícola, clima, recomendaciones de riego y guía hortícola contextual.",
 )
 
 app.add_middleware(

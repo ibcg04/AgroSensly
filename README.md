@@ -1,11 +1,11 @@
 # AgroSensly EC
 
-AgroSensly es un prototipo móvil de alta fidelidad para productores hortícolas. Convierte lecturas de humedad del suelo y clima en decisiones de riego fáciles de entender, incorpora una guía contextual por cultivo y premia hábitos que ayudan a usar mejor el agua.
+AgroSensly es una aplicación de monitoreo para productores hortícolas. Convierte lecturas de humedad del suelo y clima en decisiones de riego fáciles de entender, incorpora una guía contextual por cultivo y premia hábitos que ayudan a usar mejor el agua.
 
 ## Qué incluye
 
-- Dashboard móvil con semáforo de humedad, temperatura del suelo, clima y recomendación inmediata.
-- Modo demostración integrado: el frontend funciona aunque el backend no esté desplegado.
+- Panel responsive con estado de humedad, temperatura del suelo, clima y recomendación inmediata.
+- Continuidad operativa con lecturas locales cuando la API está temporalmente fuera de línea.
 - Cinco fichas hortícolas: tomate, lechuga, albahaca, pepino y pimiento.
 - Kinti, mascota y asistente contextual de AgroSensly.
 - Preguntas guiadas sobre riego, pH, luz, temperatura, ciclo y señales de estrés.
@@ -51,7 +51,7 @@ La app se abre en `http://localhost:5173`. Las vistas también pueden abrirse di
 
 ### Conectar el backend
 
-Sin configuración, el frontend usa datos de demostración estables para evitar una pantalla bloqueada. Para utilizar el backend real:
+Sin configuración adicional, el frontend mantiene una lectura local de la estación. Para conectarlo a la API:
 
 ```bash
 VITE_API_URL=http://localhost:8000/api npm run dev

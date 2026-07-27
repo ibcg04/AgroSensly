@@ -73,7 +73,7 @@ export function CropsView({ activeCrop, onSelectCrop, onOpenAssistant }: CropsVi
             <header>
               <div>
                 <h3 id="spec-title">Parámetros de manejo</h3>
-                <p>Valores orientativos para el prototipo.</p>
+                <p>Rangos recomendados para el manejo del cultivo.</p>
               </div>
               <span>Ficha / {activeCrop.id}</span>
             </header>

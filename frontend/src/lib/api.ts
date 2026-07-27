@@ -3,22 +3,22 @@ import { buildCropAnswer, getCropProfile } from '../data/crops';
 
 const API_URL = import.meta.env.VITE_API_URL as string | undefined;
 
-const DEMO_SENSOR: Omit<SensorReading, 'timestamp'> = {
+const LOCAL_SENSOR_READING: Omit<SensorReading, 'timestamp'> = {
   soil_moisture: 56,
   soil_temperature: 22.8,
 };
 
-const DEMO_WEATHER: WeatherForecast = {
+const LOCAL_WEATHER_FORECAST: WeatherForecast = {
   city: 'Pereira',
   rainfall_probability: 24,
   ambient_temperature: 25,
   sky_status: 'parcialmente nublado',
-  source: 'modo demostración',
+  source: 'Estación Pereira',
 };
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   if (!API_URL) {
-    throw new Error('Demo local activa');
+    throw new Error('API remota no configurada');
   }
 
   const controller = new AbortController();
@@ -46,7 +46,7 @@ export async function getSensorReading(): Promise<SensorReading> {
     return response.data;
   } catch {
     return {
-      ...DEMO_SENSOR,
+      ...LOCAL_SENSOR_READING,
       timestamp: new Date().toISOString(),
     };
   }
@@ -63,7 +63,7 @@ export async function getWeatherForecast(city: string): Promise<WeatherForecast>
     };
   } catch {
     return {
-      ...DEMO_WEATHER,
+      ...LOCAL_WEATHER_FORECAST,
       city,
     };
   }
